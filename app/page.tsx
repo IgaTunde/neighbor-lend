@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -17,11 +18,17 @@ export default function Home() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Your hyper-local resource marketplace is ready to build!
+            Share tools, equipment, and resources with your local community.
           </p>
           <div className="flex gap-2">
-            <Button>Get Started</Button>
-            <Button variant="outline">Learn More</Button>
+            <Link href="/signup" className="flex-1">
+              <Button className="w-full">Get Started</Button>
+            </Link>
+            <Link href="/login" className="flex-1">
+              <Button variant="outline" className="w-full">
+                Log In
+              </Button>
+            </Link>
           </div>
         </CardContent>
       </Card>
