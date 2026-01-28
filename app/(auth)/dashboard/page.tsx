@@ -14,11 +14,15 @@ export default async function DashboardPage() {
   // Check if user is authenticated
   const supabase = await createClient();
   const {
-    data: { user },
+    data: { user }, error
   } = await supabase.auth.getUser();
+
+  console.log('Dashboard - user:', user)
+  console.log('Dashboard - error:', error)
 
   // If not logged in, redirect to login
   if (!user) {
+    console.log('No user found, redirecting to login')
     redirect("/login");
   }
 
