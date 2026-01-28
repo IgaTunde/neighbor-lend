@@ -175,7 +175,7 @@ export function ListingForm() {
             />
             {imagePreview && (
               <div className="mt-2">
-                <Image
+                <img
                   src={imagePreview}
                   alt="Preview"
                   className="w-full h-48 object-cover rounded-md"
