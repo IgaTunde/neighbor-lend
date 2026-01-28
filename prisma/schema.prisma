@@ -1,0 +1,83 @@
+// This tells Prisma what database you're using
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Your data models start here
+// User Model
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  avatar        String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relations
+  listings      Listing[]
+  bookings      Booking[]
+}
+
+// Listing Model (the items people rent out)
+model Listing {
+  id            String    @id @default(cuid())
+  title         String
+  description   String
+  category      String
+  dailyRate     Float     // Price per day
+  imageUrl      String?
+  
+  // Location (simplified for now - we'll add real coordinates later)
+  address       String
+  latitude      Float?
+  longitude     Float?
+  
+  // Availability
+  isAvailable   Boolean   @default(true)
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relations
+  ownerId       String
+  owner         User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  bookings      Booking[]
+}
+
+// Booking Model (rental requests)
+model Booking {
+  id            String    @id @default(cuid())
+  
+  // Date range
+  startDate     DateTime
+  endDate       DateTime
+  
+  // Status tracking
+  status        BookingStatus @default(PENDING)
+  totalPrice    Float
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relations
+  listingId     String
+  listing       Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  
+  borrowerId    String
+  borrower      User      @relation(fields: [borrowerId], references: [id], onDelete: Cascade)
+}
+
+// Booking status enum
+enum BookingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
