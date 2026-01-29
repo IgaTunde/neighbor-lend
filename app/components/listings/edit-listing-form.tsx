@@ -99,7 +99,11 @@ export function EditListingForm({ listing }: EditListingFormProps) {
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to update listing");
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Update failed:", errorData);
+        throw new Error(errorData.console.error || "Failed to update listing");
+      }
 
       router.push(`/dashboard/listings/${listing.id}`);
       router.refresh();
