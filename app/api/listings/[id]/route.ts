@@ -7,9 +7,11 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } },
 ) {
+  const { id } = await params;
+
   try {
     const listing = await prisma.listing.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         owner: {
           select: {
@@ -37,7 +39,7 @@ export async function GET(
     }
 
     return NextResponse.json(listing);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -48,6 +50,8 @@ export async function DELETE(
   request: Request,
   { params }: { params: { id: string } },
 ) {
+  const { id } = await params;
+
   try {
     const supabase = await createClient();
     const {
@@ -60,7 +64,7 @@ export async function DELETE(
 
     // Check if user owns this listing
     const listing = await prisma.listing.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!listing) {
@@ -75,11 +79,11 @@ export async function DELETE(
     }
 
     await prisma.listing.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

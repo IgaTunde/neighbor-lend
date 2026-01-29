@@ -5,24 +5,31 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 
+/**
+ * LOGIN
+ */
 export async function login(formData: FormData) {
   const supabase = await createClient();
 
-  const data = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  };
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
 
-  const { error } = await supabase.auth.signInWithPassword(data);
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
   if (error) {
-    redirect("/login?error=" + error.message);
+    redirect("/login?error=" + encodeURIComponent(error.message));
   }
 
   revalidatePath("/", "layout");
   redirect("/dashboard");
 }
 
+/**
+ * SIGNUP
+ */
 export async function signup(formData: FormData) {
   const supabase = await createClient();
 
@@ -30,19 +37,25 @@ export async function signup(formData: FormData) {
   const password = formData.get("password") as string;
   const name = formData.get("name") as string;
 
+  // 1. Create user in Supabase Auth
   const { data: authData, error } = await supabase.auth.signUp({
     email,
     password,
   });
 
   if (error) {
-    redirect("/signup?error=" + error.message);
+    redirect("/signup?error=" + encodeURIComponent(error.message));
   }
 
-  // Create user in database using Prisma directly
+  // 2. Sync user with Prisma (SAFE + IDEMPOTENT)
   if (authData.user) {
-    await prisma.user.create({
-      data: {
+    await prisma.user.upsert({
+      where: { email },
+      update: {
+        id: authData.user.id, // re-link if recreated
+        name,
+      },
+      create: {
         id: authData.user.id,
         email,
         name,
@@ -53,3 +66,4 @@ export async function signup(formData: FormData) {
   revalidatePath("/", "layout");
   redirect("/dashboard");
 }
+ 
