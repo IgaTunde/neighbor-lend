@@ -70,10 +70,10 @@ export default async function ListingsPage() {
               <Card key={listing.id} className="overflow-hidden">
                 {listing.imageUrl && (
                   <div className="aspect-video relative overflow-hidden bg-muted">
-                    <img
+                    <Image
                       src={listing.imageUrl}
                       alt={listing.title}
-                      
+                      fill
                       className="object-cover"
                     />
                   </div>

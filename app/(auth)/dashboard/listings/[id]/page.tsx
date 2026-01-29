@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma"
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { DeleteListingButton } from "@/app/components/listings/delete-listing-button"
 
 
 export default async function ListingDetailPage({
@@ -86,7 +87,9 @@ export default async function ListingDetailPage({
               </CardHeader>
               <CardContent>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold">${listing.dailyRate}</span>
+                  <span className="text-4xl font-bold">
+                    ${listing.dailyRate}
+                  </span>
                   <span className="text-muted-foreground">per day</span>
                 </div>
               </CardContent>
@@ -112,7 +115,9 @@ export default async function ListingDetailPage({
                   </div>
                   <div>
                     <p className="font-medium">{listing.owner.name}</p>
-                    <p className="text-sm text-muted-foreground">{listing.owner.email}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {listing.owner.email}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -125,9 +130,10 @@ export default async function ListingDetailPage({
                   <Button variant="outline" className="flex-1">
                     Edit Listing
                   </Button>
-                  <Button variant="destructive" className="flex-1">
-                    Delete
-                  </Button>
+                  <DeleteListingButton
+                    listingId={listing.id}
+                    listingTitle={listing.title}
+                  />
                 </>
               ) : (
                 <Button className="w-full" size="lg">
@@ -160,5 +166,5 @@ export default async function ListingDetailPage({
         </Card>
       </div>
     </div>
-  )
+  );
 }
