@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { prisma } from "@/lib/prisma"
 import Image from "next/image"
@@ -127,9 +127,11 @@ export default async function ListingDetailPage({
             <div className="flex gap-2">
               {isOwner ? (
                 <>
-                  <Button variant="outline" className="flex-1">
-                    Edit Listing
-                  </Button>
+                  <Link href={`/dashboard/listings/${listing.id}/edit`}>
+                    <Button variant="outline" className="flex-1">
+                      Edit Listing
+                    </Button>
+                  </Link>
                   <DeleteListingButton
                     listingId={listing.id}
                     listingTitle={listing.title}
