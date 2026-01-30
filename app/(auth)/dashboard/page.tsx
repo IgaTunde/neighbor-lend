@@ -60,17 +60,19 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>My Bookings</CardTitle>
-              <CardDescription>Items you&apos;re borrowing</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">
-                {dbUser?.bookings.length || 0}
-              </p>
-            </CardContent>
-          </Card>
+          <Link href="/dashboard/bookings">
+            <Card className="cursor-pointer hover:bg-accent transition-colors">
+              <CardHeader>
+                <CardTitle>My Bookings</CardTitle>
+                <CardDescription>Items you&apos;re borrowing</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold">
+                  {dbUser?.bookings.length || 0}
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
 
           <Card>
             <CardHeader>
