@@ -24,13 +24,17 @@ export default async function DashboardPage() {
   }
 
   // Get user data from database
-  const dbUser = await prisma.user.findUnique({
-    where: { id: user.id },
-    include: {
-      listings: true,
-      bookings: true,
-    },
-  });
+ const dbUser = await prisma.user.findUnique({
+   where: { id: user.id },
+   include: {
+     listings: {
+       include: {
+         bookings: true,
+       },
+     },
+     bookings: true,
+   },
+ });
 
   return (
     <div className="min-h-screen p-8">
@@ -69,6 +73,28 @@ export default async function DashboardPage() {
               <CardContent>
                 <p className="text-3xl font-bold">
                   {dbUser?.bookings.length || 0}
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/dashboard/requests">
+            <Card className="cursor-pointer hover:bg-accent transition-colors">
+              <CardHeader>
+                <CardTitle>Booking Requests</CardTitle>
+                <CardDescription>
+                  Pending requests on your items
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold">
+                  {dbUser?.listings.reduce(
+                    (count, listing) =>
+                      count +
+                      listing.bookings.filter((b) => b.status === "PENDING")
+                        .length,
+                    0,
+                  ) || 0}
                 </p>
               </CardContent>
             </Card>
