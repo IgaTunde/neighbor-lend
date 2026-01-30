@@ -10,10 +10,12 @@ interface ApproveRejectButtonsProps {
 
 export function ApproveRejectButtons({ bookingId }: ApproveRejectButtonsProps) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [loadingAction, setLoadingAction] = useState<
+    "APPROVED" | "REJECTED" | null
+  >(null);
 
   const handleAction = async (action: "APPROVED" | "REJECTED") => {
-    setLoading(true);
+    setLoadingAction(action);
 
     try {
       const response = await fetch(`/api/bookings/${bookingId}`, {
@@ -31,8 +33,7 @@ export function ApproveRejectButtons({ bookingId }: ApproveRejectButtonsProps) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       alert(error.message);
-    } finally {
-      setLoading(false);
+      setLoadingAction(null);
     }
   };
 
@@ -40,18 +41,18 @@ export function ApproveRejectButtons({ bookingId }: ApproveRejectButtonsProps) {
     <div className="flex gap-2 pt-2">
       <Button
         onClick={() => handleAction("APPROVED")}
-        disabled={loading}
+        disabled={loadingAction !== null}
         className="flex-1"
       >
-        {loading ? "Processing..." : "Approve"}
+        {loadingAction === "APPROVED" ? "Approving..." : "Approve"}
       </Button>
       <Button
         onClick={() => handleAction("REJECTED")}
-        disabled={loading}
+        disabled={loadingAction !== null}
         variant="destructive"
         className="flex-1"
       >
-        {loading ? "Processing..." : "Reject"}
+        {loadingAction === "REJECTED" ? "Rejecting..." : "Reject"}
       </Button>
     </div>
   );
