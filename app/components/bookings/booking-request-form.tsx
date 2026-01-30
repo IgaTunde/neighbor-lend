@@ -25,14 +25,12 @@ interface BookingRequestFormProps {
   listingId: string;
   listingTitle: string;
   dailyRate: number;
-  currency: string;
 }
 
 export function BookingRequestForm({
   listingId,
   listingTitle,
   dailyRate,
-  currency,
 }: BookingRequestFormProps) {
   const router = useRouter();
   const [startDate, setStartDate] = useState<Date>();
@@ -112,7 +110,7 @@ export function BookingRequestForm({
                 selected={startDate}
                 onSelect={setStartDate}
                 disabled={(date) => isBefore(date, startOfDay(new Date()))}
-                initialFocus
+                autoFocus
               />
             </PopoverContent>
           </Popover>
@@ -143,7 +141,7 @@ export function BookingRequestForm({
                   isBefore(date, startDate || new Date()) ||
                   isBefore(date, startOfDay(new Date()))
                 }
-                initialFocus
+                autoFocus
               />
             </PopoverContent>
           </Popover>
@@ -154,10 +152,7 @@ export function BookingRequestForm({
           <div className="p-4 bg-muted rounded-lg space-y-2">
             <div className="flex justify-between text-sm">
               <span>Daily rate:</span>
-              <span>
-                {currency}
-                {dailyRate}
-              </span>
+              <span>${dailyRate}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span>Number of days:</span>
@@ -165,10 +160,7 @@ export function BookingRequestForm({
             </div>
             <div className="flex justify-between font-bold text-lg pt-2 border-t">
               <span>Total:</span>
-              <span>
-                {currency}
-                {totalPrice.toLocaleString()}
-              </span>
+              <span>${totalPrice.toLocaleString()}</span>
             </div>
           </div>
         )}

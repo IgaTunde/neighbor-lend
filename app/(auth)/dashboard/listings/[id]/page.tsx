@@ -8,6 +8,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { DeleteListingButton } from "@/app/components/listings/delete-listing-button"
+import { BookingRequestForm } from "@/app/components/bookings/booking-request-form"
 
 
 export default async function ListingDetailPage({
@@ -138,9 +139,11 @@ export default async function ListingDetailPage({
                   />
                 </>
               ) : (
-                <Button className="w-full" size="lg">
-                  Request to Borrow
-                </Button>
+                <BookingRequestForm
+                  listingId={listing.id}
+                  listingTitle={listing.title}
+                  dailyRate={listing.dailyRate}
+                />
               )}
             </div>
           </div>
