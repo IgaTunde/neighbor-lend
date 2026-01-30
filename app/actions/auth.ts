@@ -26,9 +26,9 @@ export async function login(formData: FormData) {
   // Ensure user exists in Prisma database
   if (data.user) {
     await prisma.user.upsert({
-      where: { id: data.user.id },
+      where: { email: data.user.email! },  // USE EMAIL NOT ID
       update: {
-        email: data.user.email!,
+        id: data.user.id,  // Update the ID in case it changed
       },
       create: {
         id: data.user.id,

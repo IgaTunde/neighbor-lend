@@ -55,6 +55,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Ensure user exists in database
+    await prisma.user.upsert({
+      where: { email: user.email! }, // USE EMAIL NOT ID
+      update: {
+        id: user.id, // Update ID if needed
+      },
+      create: {
+        id: user.id,
+        email: user.email!,
+        name: user.user_metadata?.name || user.email!.split("@")[0],
+      },
+    });
+
     const body = await request.json();
     const { listingId, startDate, endDate, totalPrice } = body;
 
@@ -107,7 +120,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(booking);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
