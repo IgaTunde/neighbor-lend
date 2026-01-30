@@ -10,7 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
-import { ApproveRejectButtons } from "@/components/bookings/approve-reject-buttons";
+import { ApproveRejectButtons } from "@/app/components/bookings/approve-reject-button";
 
 export default async function RequestsPage() {
   const supabase = await createClient();
