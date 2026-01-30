@@ -14,13 +14,28 @@ export async function login(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
 
   if (error) {
     redirect("/login?error=" + encodeURIComponent(error.message));
+  }
+
+  // Ensure user exists in Prisma database
+  if (data.user) {
+    await prisma.user.upsert({
+      where: { id: data.user.id },
+      update: {
+        email: data.user.email!,
+      },
+      create: {
+        id: data.user.id,
+        email: data.user.email!,
+        name: data.user.user_metadata?.name || data.user.email!.split('@')[0],
+      },
+    });
   }
 
   revalidatePath("/", "layout");
