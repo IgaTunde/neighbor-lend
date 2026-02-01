@@ -25,17 +25,30 @@ interface BookingRequestFormProps {
   listingId: string;
   listingTitle: string;
   dailyRate: number;
+  bookedDates?: Array<{ startDate: Date; endDate: Date }>;
 }
 
 export function BookingRequestForm({
   listingId,
   listingTitle,
+  bookedDates = [],
   dailyRate,
 }: BookingRequestFormProps) {
   const router = useRouter();
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [loading, setLoading] = useState(false);
+
+  // Helper function to check if a date is within booked ranges
+  const isDateBooked = (date: Date) => {
+    return bookedDates.some((booking) => {
+      const bookingStart = startOfDay(new Date(booking.startDate));
+      const bookingEnd = startOfDay(new Date(booking.endDate));
+      const checkDate = startOfDay(date);
+
+      return checkDate >= bookingStart && checkDate <= bookingEnd;
+    });
+  };
 
   // Calculate number of days and total price
   const numberOfDays =
@@ -73,9 +86,18 @@ export function BookingRequestForm({
       // Success! Redirect to bookings page
       router.push("/dashboard/bookings");
       router.refresh();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      alert(error.message);
+      const errorMessage = error.message || "Failed to create booking";
+
+      // Show user-friendly message
+      if (errorMessage.includes("already booked")) {
+        alert(
+          "Sorry! This item is already booked for those dates. Please choose different dates.",
+        );
+      } else {
+        alert(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -109,7 +131,9 @@ export function BookingRequestForm({
                 mode="single"
                 selected={startDate}
                 onSelect={setStartDate}
-                disabled={(date) => isBefore(date, startOfDay(new Date()))}
+                disabled={(date) =>
+                  isBefore(date, startOfDay(new Date())) || isDateBooked(date)
+                }
                 autoFocus
               />
             </PopoverContent>
@@ -139,7 +163,8 @@ export function BookingRequestForm({
                 onSelect={setEndDate}
                 disabled={(date) =>
                   isBefore(date, startDate || new Date()) ||
-                  isBefore(date, startOfDay(new Date()))
+                  isBefore(date, startOfDay(new Date())) ||
+                  isDateBooked(date)
                 }
                 autoFocus
               />

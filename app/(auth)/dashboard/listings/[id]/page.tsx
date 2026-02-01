@@ -1,32 +1,33 @@
-import { createClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { prisma } from "@/lib/prisma"
-import Image from "next/image"
-import Link from "next/link"
-import { notFound } from "next/navigation"
-import { DeleteListingButton } from "@/app/components/listings/delete-listing-button"
-import { BookingRequestForm } from "@/app/components/bookings/booking-request-form"
-
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { prisma } from "@/lib/prisma";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { DeleteListingButton } from "@/app/components/listings/delete-listing-button";
+import { BookingRequestForm } from "@/app/components/bookings/booking-request-form";
 
 export default async function ListingDetailPage({
   params,
 }: {
-  params: { id: string }
+  params: { id: string };
 }) {
   const { id } = await params;
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login")
+    redirect("/login");
   }
 
   // Fetch the listing
   const listing = await prisma.listing.findUnique({
-    where: { id},
+    where: { id },
     include: {
       owner: {
         select: {
@@ -36,14 +37,27 @@ export default async function ListingDetailPage({
           avatar: true,
         },
       },
+      bookings: {
+        where: {
+          status: "APPROVED",
+          endDate: {
+            gte: new Date(), // Only future/current bookings
+          },
+        },
+        select: {
+          startDate: true,
+          endDate: true,
+          status: true,
+        },
+      },
     },
-  })
+  });
 
   if (!listing) {
-    notFound()
+    notFound();
   }
 
-  const isOwner = listing.ownerId === user.id
+  const isOwner = listing.ownerId === user.id;
 
   return (
     <div className="min-h-screen p-8">
@@ -52,6 +66,23 @@ export default async function ListingDetailPage({
         <Link href="/dashboard/listings">
           <Button variant="ghost">← Back to listings</Button>
         </Link>
+
+        {/* Title and badges - ONLY ONCE */}
+        <div>
+          <div className="flex items-start justify-between mb-2">
+            <h1 className="text-3xl font-bold">{listing.title}</h1>
+            <div className="flex gap-2">
+              <Badge variant="secondary">{listing.category}</Badge>
+              {listing.bookings.length > 0 && (
+                <Badge variant="outline">
+                  {listing.bookings.length} active booking
+                  {listing.bookings.length > 1 ? "s" : ""}
+                </Badge>
+              )}
+            </div>
+          </div>
+          <p className="text-muted-foreground">{listing.description}</p>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Image */}
@@ -72,16 +103,8 @@ export default async function ListingDetailPage({
             )}
           </div>
 
-          {/* Details */}
+          {/* Details - NO DUPLICATE TITLE/DESCRIPTION */}
           <div className="space-y-4">
-            <div>
-              <div className="flex items-start justify-between mb-2">
-                <h1 className="text-3xl font-bold">{listing.title}</h1>
-                <Badge variant="secondary">{listing.category}</Badge>
-              </div>
-              <p className="text-muted-foreground">{listing.description}</p>
-            </div>
-
             <Card>
               <CardHeader>
                 <CardTitle>Pricing</CardTitle>
@@ -125,27 +148,29 @@ export default async function ListingDetailPage({
             </Card>
 
             {/* Action buttons */}
-            <div className="flex gap-2">
-              {isOwner ? (
-                <>
-                  <Link href={`/dashboard/listings/${listing.id}/edit`}>
-                    <Button variant="outline" className="flex-1">
-                      Edit Listing
-                    </Button>
-                  </Link>
-                  <DeleteListingButton
-                    listingId={listing.id}
-                    listingTitle={listing.title}
-                  />
-                </>
-              ) : (
-                <BookingRequestForm
+            {isOwner ? (
+              <div className="flex gap-2">
+                <Link
+                  href={`/dashboard/listings/${listing.id}/edit`}
+                  className="flex-1"
+                >
+                  <Button variant="outline" className="w-full">
+                    Edit Listing
+                  </Button>
+                </Link>
+                <DeleteListingButton
                   listingId={listing.id}
                   listingTitle={listing.title}
-                  dailyRate={listing.dailyRate}
                 />
-              )}
-            </div>
+              </div>
+            ) : (
+              <BookingRequestForm
+                listingId={listing.id}
+                listingTitle={listing.title}
+                dailyRate={listing.dailyRate}
+                bookedDates={listing.bookings}
+              />
+            )}
           </div>
         </div>
 

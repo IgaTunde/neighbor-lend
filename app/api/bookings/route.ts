@@ -95,6 +95,48 @@ export async function POST(request: Request) {
       );
     }
 
+    // CHECK FOR DATE CONFLICTS
+    const requestStart = new Date(startDate);
+    const requestEnd = new Date(endDate);
+
+    // Find any APPROVED bookings that overlap with requested dates
+    const conflictingBookings = await prisma.booking.findMany({
+      where: {
+        listingId,
+        status: "APPROVED",
+        OR: [
+          // Case 1: Existing booking starts during requested period
+          {
+            startDate: {
+              gte: requestStart,
+              lte: requestEnd,
+            },
+          },
+          // Case 2: Existing booking ends during requested period
+          {
+            endDate: {
+              gte: requestStart,
+              lte: requestEnd,
+            },
+          },
+          // Case 3: Existing booking completely contains requested period
+          {
+            AND: [
+              { startDate: { lte: requestStart } },
+              { endDate: { gte: requestEnd } },
+            ],
+          },
+        ],
+      },
+    });
+
+    if (conflictingBookings.length > 0) {
+      return NextResponse.json(
+        { error: "This item is already booked for the selected dates" },
+        { status: 400 },
+      );
+    }
+
     // Create the booking
     const booking = await prisma.booking.create({
       data: {
