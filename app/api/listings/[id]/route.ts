@@ -5,13 +5,13 @@ import { NextResponse } from "next/server";
 // GET single listing
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } },
+  context: { params: Promise<{ id: string }> }  // ✅ NEW WAY
 ) {
-  const { id } = await params;
-
   try {
+    const params = await context.params  // Await the Promise
+
     const listing = await prisma.listing.findUnique({
-      where: { id },
+      where: { id: params.id },
       include: {
         owner: {
           select: {
@@ -32,19 +32,24 @@ export async function GET(
           },
         },
       },
-    });
+    })
 
     if (!listing) {
-      return NextResponse.json({ error: "Listing not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Listing not found" },
+        { status: 404 }
+      )
     }
 
-    return NextResponse.json(listing);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return NextResponse.json(listing)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500 }
+    )
   }
 }
-
 // DELETE listing
 export async function DELETE(
   request: Request,
