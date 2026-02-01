@@ -8,10 +8,10 @@ export async function GET(
   context: { params: Promise<{ id: string }> }  // ✅ NEW WAY
 ) {
   try {
-    const params = await context.params  // Await the Promise
-
+    const params = await context.params 
+  const { id } = params;
     const listing = await prisma.listing.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         owner: {
           select: {
@@ -53,9 +53,10 @@ export async function GET(
 // DELETE listing
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } },
+  context: { params: Promise<{ id: string }> },
 ) {
-  const { id } = await params;
+  const params = await context.params;
+  const { id } = params;
 
   try {
     const supabase = await createClient();
@@ -99,7 +100,9 @@ export async function DELETE(
 export async function PATCH(
   request: Request,
   context: { params: Promise<{ id: string }> }
+
 ) {
+
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -112,11 +115,12 @@ export async function PATCH(
     }
 
     const params = await context.params
+    const {id} = params
     const body = await request.json()
 
     // Check if user owns this listing
     const listing = await prisma.listing.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!listing) {
