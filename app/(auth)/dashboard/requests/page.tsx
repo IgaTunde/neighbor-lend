@@ -76,7 +76,7 @@ export default async function RequestsPage() {
           </Card>
         ) : (
           <div className="space-y-4">
-            {requests.map((request) => (
+            {requests.map((request: (typeof requests)[0]) => (
               <Card key={request.id}>
                 <CardHeader>
                   <div className="flex justify-between items-start">
