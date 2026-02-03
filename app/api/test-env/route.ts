@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+// API route to verify that environment variables are set correctly
 export async function GET() {
   return NextResponse.json({
     hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
