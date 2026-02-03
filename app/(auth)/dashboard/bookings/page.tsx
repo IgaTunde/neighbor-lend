@@ -13,6 +13,23 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
+
+type BookingWithDetails = {
+  id: string;
+  startDate: Date;
+  endDate: Date;
+  totalPrice: number;
+  status: string;
+  listing: {
+    id: string;
+    title: string;
+    owner: {
+      name: string | null;
+      email: string;
+    };
+  };
+};
+
 export default async function BookingsPage() {
   const supabase = await createClient();
   const {
@@ -81,7 +98,7 @@ export default async function BookingsPage() {
           </Card>
         ) : (
           <div className="space-y-4">
-            {bookings.map((booking) => (
+            {bookings.map((booking: BookingWithDetails) => (
               <Card key={booking.id}>
                 <CardHeader>
                   <div className="flex justify-between items-start">
