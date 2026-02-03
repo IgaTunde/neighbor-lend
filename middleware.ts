@@ -13,7 +13,7 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          // Recreate the response and set cookies on it
+          // IMPORTANT: never mutate request.cookies in middleware (Edge)
           response = NextResponse.next();
 
           cookiesToSet.forEach(({ name, value, options }) => {
@@ -24,14 +24,12 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  // refresh session
+  // Refresh session if expired
   await supabase.auth.getUser();
 
   return response;
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  matcher: ["/dashboard/:path*"], // tighten while debugging
 };
