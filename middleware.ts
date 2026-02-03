@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+// This middleware ensures that the Supabase session is refreshed on each request
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next();
 
