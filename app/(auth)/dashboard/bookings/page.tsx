@@ -12,22 +12,6 @@ import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Prisma } from "@prisma/client";
-
-type BookingWithListing = Prisma.BookingGetPayload<{
-  include: {
-    listing: {
-      include: {
-        owner: {
-          select: {
-            name: true;
-            email: true;
-          };
-        };
-      };
-    };
-  };
-}>;
 
 export default async function BookingsPage() {
   const supabase = await createClient();
@@ -39,7 +23,8 @@ export default async function BookingsPage() {
     redirect("/login");
   }
 
-  const bookings: BookingWithListing[] = await prisma.booking.findMany({
+  // Get all bookings for this user
+  const bookings = await prisma.booking.findMany({
     where: {
       borrowerId: user.id,
     },
@@ -60,7 +45,7 @@ export default async function BookingsPage() {
     },
   });
 
-  const getStatusColor = (status: BookingWithListing["status"]) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "PENDING":
         return "default";
@@ -111,7 +96,6 @@ export default async function BookingsPage() {
                     </Badge>
                   </div>
                 </CardHeader>
-
                 <CardContent className="space-y-2">
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
@@ -127,14 +111,12 @@ export default async function BookingsPage() {
                       </p>
                     </div>
                   </div>
-
                   <div className="pt-2 border-t">
                     <p className="text-muted-foreground text-sm">Total Price</p>
                     <p className="text-2xl font-bold">
                       ${booking.totalPrice.toLocaleString()}
                     </p>
                   </div>
-
                   <Link href={`/dashboard/listings/${booking.listing.id}`}>
                     <Button variant="outline" size="sm" className="w-full mt-2">
                       View Listing
