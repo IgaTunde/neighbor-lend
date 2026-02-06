@@ -5,11 +5,8 @@ import { redirect } from "next/navigation";
 export default async function NewListingPage() {
   const supabase = await createClient();
   const {
-    data: { user }, error
+    data: { user },
   } = await supabase.auth.getUser();
-
-  console.log('Data - user:', user)
-  console.log('Data - error:', error)
 
   if (!user) {
     redirect("/login");

@@ -100,9 +100,17 @@ export function EditListingForm({ listing }: EditListingFormProps) {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Update failed:", errorData);
-        throw new Error(errorData.console.error || "Failed to update listing");
+        let errorMessage = "Failed to update listing";
+        try {
+          const errorData = await response.json();
+          if (errorData && typeof errorData.error === "string") {
+            errorMessage = errorData.error;
+          }
+        } catch {
+          // Ignore JSON parse failures and fall back to the default message.
+        }
+        console.error("Update failed:", errorMessage);
+        throw new Error(errorMessage);
       }
 
       router.push(`/dashboard/listings/${listing.id}`);

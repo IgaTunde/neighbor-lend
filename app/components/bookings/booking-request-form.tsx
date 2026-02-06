@@ -23,14 +23,12 @@ import { cn } from "@/lib/utils";
 
 interface BookingRequestFormProps {
   listingId: string;
-  listingTitle: string;
   dailyRate: number;
   bookedDates?: Array<{ startDate: Date; endDate: Date }>;
 }
 
 export function BookingRequestForm({
   listingId,
-  listingTitle,
   bookedDates = [],
   dailyRate,
 }: BookingRequestFormProps) {

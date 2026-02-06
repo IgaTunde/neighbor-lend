@@ -174,11 +174,13 @@ export function ListingForm() {
               onChange={handleImageChange}
             />
             {imagePreview && (
-              <div className="mt-2">
-                <img
+              <div className="relative mt-2 h-48 w-full overflow-hidden rounded-md">
+                <Image
                   src={imagePreview}
                   alt="Preview"
-                  className="w-full h-48 object-cover rounded-md"
+                  fill
+                  className="object-cover"
+                  unoptimized
                 />
               </div>
             )}

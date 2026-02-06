@@ -13,7 +13,7 @@ import { BookingRequestForm } from "@/app/components/bookings/booking-request-fo
 export default async function ListingDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
   const supabase = await createClient();
@@ -166,7 +166,6 @@ export default async function ListingDetailPage({
             ) : (
               <BookingRequestForm
                 listingId={listing.id}
-                listingTitle={listing.title}
                 dailyRate={listing.dailyRate}
                 bookedDates={listing.bookings}
               />

@@ -4,12 +4,11 @@ import { NextResponse } from "next/server";
 
 // GET single listing
 export async function GET(
-  request: Request,
-  context: { params: Promise<{ id: string }> }  // ✅ NEW WAY
+  _request: Request,
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
-    const params = await context.params 
-  const { id } = params;
+    const { id } = await context.params;
     const listing = await prisma.listing.findUnique({
       where: { id },
       include: {
@@ -52,11 +51,10 @@ export async function GET(
 }
 // DELETE listing
 export async function DELETE(
-  request: Request,
+  _request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
-  const params = await context.params;
-  const { id } = params;
+  const { id } = await context.params;
 
   try {
     const supabase = await createClient();
